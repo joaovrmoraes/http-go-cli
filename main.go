@@ -22,6 +22,8 @@ func main() {
 
 	url := flag.String("url", "", "URL to make the HTTPS request")
 
+	bearer := flag.String("bearer", "", "Bearer token to authenticate the request")
+
 	data := flag.String("data", "", "Data to send in the request body (for POST, PUT, etc.)")
 	flag.StringVar(data, "d", "", "Data to send in the request body (for POST, PUT, etc.)")
 
@@ -61,6 +63,8 @@ func main() {
 		req.Header.Set("Content-Type", "application/json")
 	}
 
+	req.Header.Add("Authorization", "Bearer "+*bearer)
+
 	// Send the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -80,7 +84,8 @@ func main() {
 	}
 
 	// Convert the response body to JSON
-	var jsonObj map[string]interface{}
+	var jsonObj interface{}
+
 	err = json.Unmarshal(body, &jsonObj)
 	if err != nil {
 		fmt.Printf("Error converting the response body to JSON: %v\n", err)
