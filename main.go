@@ -110,13 +110,15 @@ func main() {
 			os.Exit(1)
 		}
 
-		jsonBytes, err := json.Marshal(jsonObj)
+		// Write the formatted JSON to the temporary file
+		var formattedJson []byte
+		formattedJson, err = json.MarshalIndent(jsonObj, "", "  ")
 		if err != nil {
 			fmt.Printf("Error converting the JSON to bytes: %v\n", err)
 			os.Exit(1)
 		}
 
-		if _, err := tmpfile.Write(jsonBytes); err != nil {
+		if _, err := tmpfile.Write(formattedJson); err != nil {
 			fmt.Printf("Error writing to the temporary file: %v\n", err)
 			os.Exit(1)
 		}
