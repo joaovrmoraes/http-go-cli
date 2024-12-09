@@ -66,7 +66,9 @@ func main() {
 	req.Header.Add("Authorization", "Bearer "+*bearer)
 
 	// Send the request
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("Error making the request: %v\n", err)
