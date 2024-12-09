@@ -22,7 +22,7 @@ func main() {
 
 	url := flag.String("url", "", "URL to make the HTTPS request")
 
-	token := flag.String("token", "", "Bearer token to authenticate the request")
+	bearer := flag.String("bearer", "", "Bearer token to authenticate the request")
 
 	data := flag.String("data", "", "Data to send in the request body (for POST, PUT, etc.)")
 	flag.StringVar(data, "d", "", "Data to send in the request body (for POST, PUT, etc.)")
@@ -63,7 +63,7 @@ func main() {
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	req.Header.Add("Authorization", "Bearer "+*token)
+	req.Header.Add("Authorization", "Bearer "+*bearer)
 
 	// Send the request
 	client := &http.Client{}
