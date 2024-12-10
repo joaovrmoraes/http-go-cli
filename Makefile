@@ -4,4 +4,4 @@ build:
     go build -o $(BINARY_NAME) .
 
 install:
-    go install -o $(BINARY_NAME) .
+    go install .

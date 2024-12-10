@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"sort"
 
-	"github.com/TylerBrock/colorjson"
 	"github.com/fatih/color"
 )
 
@@ -48,16 +48,26 @@ func PrintHeaders(headers http.Header) {
 	}
 }
 
+func CleanBody(input []byte) []byte {
+	re := regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
+	return re.ReplaceAll(input, nil)
+}
+
 func FormatJSON(body []byte) ([]byte, error) {
+	cleanBody := CleanBody(body)
+
 	var jsonObj interface{}
-	err := json.Unmarshal(body, &jsonObj)
+	err := json.Unmarshal(cleanBody, &jsonObj)
 	if err != nil {
 		return nil, fmt.Errorf("error converting the response body to JSON: %v", err)
 	}
 
-	f := colorjson.NewFormatter()
-	f.Indent = 2
-	return f.Marshal(jsonObj)
+	formattedJSON, err := json.MarshalIndent(jsonObj, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("error formatting JSON: %v", err)
+	}
+
+	return formattedJSON, nil
 }
 
 func SaveToFile(coloredJSON []byte) {
