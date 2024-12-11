@@ -10,7 +10,11 @@ import (
 )
 
 func main() {
-	method, url, bearer, data, save := parseFlags()
+	method, url, bearer, data, save, showInterface := parseFlags()
+
+	if *showInterface {
+		return
+	}
 
 	if *url == "" {
 		fmt.Println("Please provide a URL using the -url flag")
@@ -24,7 +28,7 @@ func main() {
 	controller.HandleRequest(*method, *url, *bearer, *data, *save)
 }
 
-func parseFlags() (*string, *string, *string, *string, *bool) {
+func parseFlags() (*string, *string, *string, *string, *bool, *bool) {
 	method := flag.String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
 	flag.StringVar(method, "m", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
 
@@ -39,6 +43,9 @@ func parseFlags() (*string, *string, *string, *string, *bool) {
 	save := flag.Bool("save", false, "Open the JSON response in the text editor")
 	flag.BoolVar(save, "s", false, "Open the JSON response in the text editor")
 
+	showInterface := flag.Bool("interface", false, "Show the Bubble Tea interface")
+	flag.BoolVar(showInterface, "i", false, "Show the Bubble Tea interface")
+
 	flag.Parse()
-	return method, url, bearer, data, save
+	return method, url, bearer, data, save, showInterface
 }

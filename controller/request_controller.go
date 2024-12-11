@@ -37,9 +37,11 @@ func HandleRequest(method, url, bearer, data string, save bool) {
 		return
 	}
 
+	title := method + " : " + fmt.Sprintf("%d", resp.StatusCode) + " | " + url + " | " + elapsed.String()
+
 	if save {
 		view.SaveToFile(coloredJSON)
 	} else {
-		fmt.Println(string(coloredJSON))
+		view.StartInterface(string(coloredJSON), title, resp.Header)
 	}
 }
