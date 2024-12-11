@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/joaovrmoraes/http-go-cli/model"
 )
 
 var (
@@ -29,7 +30,7 @@ var (
 	}()
 )
 
-type model struct {
+type modelTea struct {
 	content  string
 	header   string
 	subtitle string
@@ -37,34 +38,41 @@ type model struct {
 	viewport viewport.Model
 }
 
-func (m model) Init() tea.Cmd {
+func (m modelTea) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m modelTea) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "esc", "ctrl+c":
+			return m, tea.Quit
+		}
+	}
 	var cmd tea.Cmd
 	m.viewport, cmd = m.viewport.Update(msg)
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m modelTea) View() string {
 	if !m.ready {
 		return "\n  Initializing..."
 	}
 	return fmt.Sprintf("%s\n%s\n%s\n%s", m.headerView(), m.subtitleView(), m.viewport.View(), m.footerView())
 }
 
-func (m model) headerView() string {
+func (m modelTea) headerView() string {
 	title := titleStyle.Render(m.header)
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
 }
 
-func (m model) subtitleView() string {
+func (m modelTea) subtitleView() string {
 	return subtitleStyle.Render(m.subtitle)
 }
 
-func (m model) footerView() string {
+func (m modelTea) footerView() string {
 	info := infoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
@@ -93,13 +101,22 @@ func StartInterface(jsonResponse, header string, headers map[string][]string) {
 		os.Exit(1)
 	}
 
+	var coloredHistory strings.Builder
+	err = quick.Highlight(&coloredHistory, "Request History", "plaintext", "terminal", "monokai")
+	if err != nil {
+		fmt.Println("could not highlight history:", err)
+		os.Exit(1)
+	}
+
 	subtitle := formatHeaders(headers)
 
 	vp := viewport.New(80, 20)
-	vp.SetContent(coloredJSON.String())
+	vp.SetContent(coloredJSON.String() + "\n\n" + coloredHistory.String() + "\n" + model.DisplayHistory())
+
+	// content := fmt.Sprintf("%s\n%s", coloredHistory.String(), coloredJSON.String())
 
 	p := tea.NewProgram(
-		model{content: coloredJSON.String(), header: header, subtitle: subtitle, viewport: vp, ready: true},
+		modelTea{header: header, subtitle: subtitle, viewport: vp, ready: true},
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)

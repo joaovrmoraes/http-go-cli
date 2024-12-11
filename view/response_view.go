@@ -102,22 +102,3 @@ func SaveToFile(coloredJSON []byte) {
 		return
 	}
 }
-
-func saveHistoryToFile(requestHistory []Request) {
-	tempFile, err := os.CreateTemp("", "request_history_*.txt")
-	if err != nil {
-		fmt.Println("Error creating temporary file:", err)
-		return
-	}
-	defer tempFile.Close()
-
-	for _, req := range requestHistory {
-		_, err := tempFile.WriteString(fmt.Sprintf("%s %s\n", req.Method, req.URL))
-		if err != nil {
-			fmt.Println("Error writing to temporary file:", err)
-			return
-		}
-	}
-
-	fmt.Println("Request history saved to:", tempFile.Name())
-}

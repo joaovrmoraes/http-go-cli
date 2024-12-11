@@ -10,6 +10,8 @@ import (
 )
 
 func HandleRequest(method, url, bearer, data string, save bool) {
+	model.LoadHistoryFromFile()
+
 	start := time.Now()
 	resp, err := model.MakeRequest(method, url, bearer, data)
 	if err != nil {
@@ -50,4 +52,5 @@ func HandleRequest(method, url, bearer, data string, save bool) {
 		view.StartInterface(string(coloredJSON), title, resp.Header)
 	}
 
+	model.AddToHistory(method, url, bearer, data)
 }

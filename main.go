@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/joaovrmoraes/http-go-cli/controller"
-	"github.com/joaovrmoraes/http-go-cli/model"
 )
 
 func main() {
@@ -26,9 +25,7 @@ func main() {
 		*url = "http://localhost" + *url
 	}
 
-	model.AddToHistory(*method, *url, *bearer, *data)
 	controller.HandleRequest(*method, *url, *bearer, *data, *save)
-	model.SaveHistoryToFile()
 }
 
 func parseFlags() (*string, *string, *string, *string, *bool, *bool) {
