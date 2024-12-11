@@ -12,6 +12,13 @@ import (
 	"github.com/fatih/color"
 )
 
+type Request struct {
+	Method string
+	URL    string
+	Bearer string
+	Data   string
+}
+
 func PrintStatus(statusCode int) {
 	var statusColor *color.Color
 
@@ -94,4 +101,23 @@ func SaveToFile(coloredJSON []byte) {
 		fmt.Printf("Error opening the text editor: %v\n", err)
 		return
 	}
+}
+
+func saveHistoryToFile(requestHistory []Request) {
+	tempFile, err := os.CreateTemp("", "request_history_*.txt")
+	if err != nil {
+		fmt.Println("Error creating temporary file:", err)
+		return
+	}
+	defer tempFile.Close()
+
+	for _, req := range requestHistory {
+		_, err := tempFile.WriteString(fmt.Sprintf("%s %s\n", req.Method, req.URL))
+		if err != nil {
+			fmt.Println("Error writing to temporary file:", err)
+			return
+		}
+	}
+
+	fmt.Println("Request history saved to:", tempFile.Name())
 }

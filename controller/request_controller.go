@@ -44,4 +44,6 @@ func HandleRequest(method, url, bearer, data string, save bool) {
 	} else {
 		view.StartInterface(string(coloredJSON), title, resp.Header)
 	}
+
+	model.AddToHistory(method, url, bearer, data)
 }
