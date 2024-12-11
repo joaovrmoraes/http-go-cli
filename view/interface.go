@@ -42,38 +42,9 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var (
-		cmd  tea.Cmd
-		cmds []tea.Cmd
-	)
-
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		if k := msg.String(); k == "ctrl+c" || k == "q" || k == "esc" {
-			return m, tea.Quit
-		}
-
-	case tea.WindowSizeMsg:
-		headerHeight := lipgloss.Height(m.headerView())
-		subtitleHeight := lipgloss.Height(m.subtitleView())
-		footerHeight := lipgloss.Height(m.footerView())
-		verticalMarginHeight := headerHeight + subtitleHeight + footerHeight
-
-		if !m.ready {
-			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
-			m.viewport.YPosition = headerHeight + subtitleHeight
-			m.viewport.SetContent(m.content)
-			m.ready = true
-		} else {
-			m.viewport.Width = msg.Width
-			m.viewport.Height = msg.Height - verticalMarginHeight
-		}
-	}
-
+	var cmd tea.Cmd
 	m.viewport, cmd = m.viewport.Update(msg)
-	cmds = append(cmds, cmd)
-
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func (m model) View() string {
@@ -124,8 +95,11 @@ func StartInterface(jsonResponse, header string, headers map[string][]string) {
 
 	subtitle := formatHeaders(headers)
 
+	vp := viewport.New(80, 20)
+	vp.SetContent(coloredJSON.String())
+
 	p := tea.NewProgram(
-		model{content: coloredJSON.String(), header: header, subtitle: subtitle},
+		model{content: coloredJSON.String(), header: header, subtitle: subtitle, viewport: vp, ready: true},
 		tea.WithAltScreen(),
 		tea.WithMouseCellMotion(),
 	)
