@@ -31,6 +31,11 @@ func HandleRequest(method, url, bearer, data string, save bool) {
 		return
 	}
 
+	if len(body) == 0 {
+		fmt.Println("Response body is empty, nothing to display.")
+		return
+	}
+
 	coloredJSON, err := view.FormatJSON(body)
 	if err != nil {
 		fmt.Printf("Error formatting the JSON: %v\n", err)
@@ -45,5 +50,4 @@ func HandleRequest(method, url, bearer, data string, save bool) {
 		view.StartInterface(string(coloredJSON), title, resp.Header)
 	}
 
-	model.AddToHistory(method, url, bearer, data)
 }
