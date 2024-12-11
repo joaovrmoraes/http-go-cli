@@ -41,13 +41,13 @@ func DisplayHistory() string {
 func SaveHistoryToFile() {
 	data, err := json.MarshalIndent(requestHistory, "", "  ")
 	if err != nil {
-		fmt.Println("Erro ao salvar o histórico:", err)
+		fmt.Println("Error saving history:", err)
 		return
 	}
 
 	err = os.WriteFile(historyFile, data, 0644)
 	if err != nil {
-		fmt.Println("Erro ao escrever o histórico no arquivo:", err)
+		fmt.Println("Error writing history to file:", err)
 		return
 	}
 }
@@ -60,13 +60,13 @@ func LoadHistoryFromFile() {
 
 	data, err := os.ReadFile(historyFile)
 	if err != nil {
-		fmt.Println("Erro ao ler o arquivo de histórico:", err)
+		fmt.Println("Error reading history file:", err)
 		return
 	}
 
 	err = json.Unmarshal(data, &requestHistory)
 	if err != nil {
-		fmt.Println("Erro ao carregar o histórico:", err)
+		fmt.Println("Error loading history:", err)
 		return
 	}
 }
